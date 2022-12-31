@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import java.lang.ArithmeticException
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,10 +47,104 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun onOperator(view: View){
+    fun OnEquals(view : View){
+        // we need to check that last number was a numeric
+        if(lastNumeric){
+            var tvValue = tvInput?.text.toString()  // this converts the tvInput to string and stores that into the tvValue
+            var prefix = ""
+            try {
+                if(tvValue.startsWith("-")){
+                    // this code will execute when the string starts with "-"
+                    // this code will get the substring, ignoring the first position that is minus
+                    prefix = "-"
+                    tvValue = tvValue.substring(1) // gives the substring with ignoring the minus
+                }
+
+                if(tvValue.contains("-")){
+                    val splitValue = tvValue.split("-")  // lets say we have "99-1" then it will split in the form of array -> 99  1
+
+                    // we are now storing the value of splitValue in diff variables
+                    var one = splitValue[0]  // this is also a string
+                    var two = splitValue[1]  // this is also a string
+
+                    if(prefix.isNotEmpty()){
+                        one = prefix + one
+                    }
+
+                    var result = one.toDouble() - two.toDouble()  // we are converting one and two into double
+
+                    tvInput?.text = removeZeroAfterResult(result.toString()) // we cannot assign double value to tvInput because it requires string as it is textView
+
+                    // alternative way is:
+                    // tvInput?.text = (one.toDouble() - two.toDouble()).toString()
+                }else if(tvValue.contains("+")){
+                    val splitValue = tvValue.split("+")
+
+                    var one = splitValue[0]
+                    var two = splitValue[1]
+
+                    if(prefix.isNotEmpty()){
+                        one = prefix + one
+                    }
+
+                    var result = one.toDouble() + two.toDouble()
+
+                    tvInput?.text = removeZeroAfterResult(result.toString())
+
+                }else if(tvValue.contains("*")){
+                    val splitValue = tvValue.split("*")
+
+                    var one = splitValue[0]
+                    var two = splitValue[1]
+
+                    if(prefix.isNotEmpty()){
+                        one = prefix + one
+                    }
+
+                    var result = one.toDouble() * two.toDouble()
+
+                    tvInput?.text = removeZeroAfterResult(result.toString())
+
+                }else if(tvValue.contains("/")){
+                    val splitValue = tvValue.split("/")
+
+                    var one = splitValue[0]
+                    var two = splitValue[1]
+
+                    if(prefix.isNotEmpty()){
+                        one = prefix + one
+                    }
+
+                    var result = one.toDouble() / two.toDouble()
+
+                    tvInput?.text = removeZeroAfterResult(result.toString())
+                }
+
+
+
+            }catch (e : ArithmeticException){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun removeZeroAfterResult(result : String) : String{
+        var Value = result
+        if(result.contains(".0")){
+            Value = result.substring(0, result.length-2)
+        }
+
+        return Value
+    }
+
+
+    fun onOperator(view: View){   // this function checks whether there is an operator in the string or not
+        // if there is an operator then we cannot add another operator..
         tvInput?.text?.let{
             if(lastNumeric && !isOperatorAdded(it.toString())){
                 tvInput?.append((view as Button).text)
+                lastNumeric = false
+                lastDot = false
             }
         }
     }
